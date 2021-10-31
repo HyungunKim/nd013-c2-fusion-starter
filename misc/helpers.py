@@ -36,7 +36,7 @@ def make_exec_list(exec_detection, exec_tracking, exec_visualization):
     exec_list = exec_detection + exec_tracking + exec_visualization
     
     # check if we need pcl
-    if any(i in exec_list for i in ('validate_object_labels', 'bev_from_pcl')):
+    if any(i in exec_list for i in ('validate_object_labels', 'bev_from_pcl', 'show_pcl')):
         exec_list.append('pcl_from_rangeimage')
     # check if we need image
     if any(i in exec_list for i in ('show_tracks', 'show_labels_in_image', 'show_objects_in_bev_labels_in_camera')):
