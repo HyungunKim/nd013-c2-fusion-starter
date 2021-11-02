@@ -25,7 +25,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 # model-related
 from tools.objdet_models.resnet.models import fpn_resnet
 from tools.objdet_models.resnet.utils.evaluation_utils import decode, post_processing 
-
+from tools.objdet_models.resnet.utils.torch_utils import _sigmoid
 from tools.objdet_models.darknet.models.darknet2pytorch import Darknet as darknet
 from tools.objdet_models.darknet.utils.evaluation_utils import post_processing_v2
 
@@ -68,7 +68,8 @@ def load_configs_model(model_name='darknet', configs=None):
         configs.conf_thresh = 0.5
         configs.distributed = False  # For testing on 1 GPU only
         configs.input_size = (608, 608)
-        configs.hm_size = (152, 152)
+        #configs.hm_size = (152, 152)
+        configs.hm_size = (608, 608)
         configs.down_ratio = 4
         configs.max_objects = 50
 
@@ -147,6 +148,7 @@ def create_model(configs):
         #######
         print("student task ID_S3_EX1-4")
         model = fpn_resnet.get_pose_net(configs.num_layers, configs.heads, configs.head_conv, configs.pretrained_filename)
+
         #######
         ####### ID_S3_EX1-4 END #######     
     
@@ -187,22 +189,24 @@ def detect_objects(input_bev_maps, model, configs):
                 for obj in detection:
                     x, y, w, l, im, re, _, _, _ = obj
                     yaw = np.arctan2(im, re)
-                    detections.append([1, x, y, 0.0, 1.50, w, l, yaw])    
+                    detections.append([1, x, y, 0.0, 1.50, w, l, yaw])
+            return detections
 
         elif 'fpn_resnet' in configs.arch:
             # decode output and perform post-processing
             ####### ID_S3_EX1-5 START #######
             #######
             print("student task ID_S3_EX1-5")
+            outputs['hm_cen'] = _sigmoid(outputs['hm_cen'])
+            outputs['cen_offset'] = _sigmoid(outputs['cen_offset'])
+
             decoded = decode(**outputs)
-            decoded = decoded.detach().numpy()
+            decoded = decoded.cpu().numpy().astype(np.float32)
 
             output_post = post_processing(decoded, configs)
 
-
             ####### ID_S3_EX1-5 END #######     
 
-            
 
     ####### ID_S3_EX2 START #######     
     #######
@@ -223,10 +227,9 @@ def detect_objects(input_bev_maps, model, configs):
             ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
             for obj in detection[objs]:
                 try:
-                    x, y, z, h, w, l, im, re = obj
-                    yaw = np.arctan2(im, re)
+                    _score, x, y, z, h, w, l, yaw = obj
                     ## step 4 : append the current object to the 'objects' array
-                    objects.append([1, x, y, 0.0, 1.50, w, l, yaw])
+                    objects.append([1, x, y, z, h, w, l, yaw])
                 except:
                     pass
 

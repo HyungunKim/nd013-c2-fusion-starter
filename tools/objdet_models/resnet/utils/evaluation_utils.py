@@ -124,12 +124,12 @@ def post_processing(detections, configs):
             # x, y, z, h, w, l, yaw
             top_preds[j] = np.concatenate([
                 detections[i, inds, 0:1],
-                detections[i, inds, 1:2] * configs.down_ratio,
-                detections[i, inds, 2:3] * configs.down_ratio,
+                detections[i, inds, 1:2]* configs.down_ratio,
+                detections[i, inds, 2:3]* configs.down_ratio,
                 detections[i, inds, 3:4],
                 detections[i, inds, 4:5],
-                detections[i, inds, 5:6] / (configs.lim_y[1]-configs.lim_y[0]) * configs.bev_width,
-                detections[i, inds, 6:7] / (configs.lim_x[1]-configs.lim_x[0]) * configs.bev_height,
+                detections[i, inds, 5:6]/ (configs.lim_y[1]-configs.lim_y[0]) * configs.bev_width,
+                detections[i, inds, 6:7]/ (configs.lim_x[1]-configs.lim_x[0]) * configs.bev_height,
                 get_yaw(detections[i, inds, 7:9]).astype(np.float32)], axis=1)
             # Filter by conf_thresh
             if len(top_preds[j]) > 0:
@@ -138,3 +138,34 @@ def post_processing(detections, configs):
         ret.append(top_preds)
 
     return ret
+
+# bev image coordinates format
+def get_corners(x, y, w, l, yaw):
+    bev_corners = np.zeros((4, 2), dtype=np.float32)
+    cos_yaw = np.cos(yaw)
+    sin_yaw = np.sin(yaw)
+    # front left
+    bev_corners[0, 0] = x - w / 2 * cos_yaw - l / 2 * sin_yaw
+    bev_corners[0, 1] = y - w / 2 * sin_yaw + l / 2 * cos_yaw
+
+    # rear left
+    bev_corners[1, 0] = x - w / 2 * cos_yaw + l / 2 * sin_yaw
+    bev_corners[1, 1] = y - w / 2 * sin_yaw - l / 2 * cos_yaw
+
+    # rear right
+    bev_corners[2, 0] = x + w / 2 * cos_yaw + l / 2 * sin_yaw
+    bev_corners[2, 1] = y + w / 2 * sin_yaw - l / 2 * cos_yaw
+
+    # front right
+    bev_corners[3, 0] = x + w / 2 * cos_yaw - l / 2 * sin_yaw
+    bev_corners[3, 1] = y + w / 2 * sin_yaw + l / 2 * cos_yaw
+
+    return bev_corners
+
+
+def drawRotatedBox(img, x, y, w, l, yaw, color):
+    bev_corners = get_corners(x, y, w, l, yaw)
+    corners_int = bev_corners.reshape(-1, 1, 2).astype(int)
+    cv2.polylines(img, [corners_int], True, color, 2)
+    corners_int = bev_corners.reshape(-1, 2)
+    cv2.line(img, (corners_int[0, 0], corners_int[0, 1]), (corners_int[3, 0], corners_int[3, 1]), (255, 255, 0), 2)
