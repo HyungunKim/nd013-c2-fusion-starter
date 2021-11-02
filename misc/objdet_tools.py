@@ -369,6 +369,7 @@ def show_objects_labels_in_bev(detections, object_labels, bev_maps, configs):
     
     label_detections = convert_labels_into_objects(object_labels, configs)
     project_detections_into_bev(bev_map, label_detections, configs, [0,255,0])
+
     project_detections_into_bev(bev_map, detections, configs, [0,0,255])
     
 
