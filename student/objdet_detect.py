@@ -44,7 +44,7 @@ def load_configs_model(model_name='darknet', configs=None):
     # set parameters according to model type
     if model_name == "darknet":
         configs.model_path = os.path.join(parent_path, 'tools', 'objdet_models', 'darknet')
-        configs.pretrained_filename = os.path.join(configs.model_path, 'pretrained', 'complex_yolov4_mse_loss.pth')
+        #configs.pretrained_filename = os.path.join(configs.model_path, 'pretrained', 'complex_yolov4_mse_loss.pth')
         configs.arch = 'darknet'
         configs.batch_size = 4
         configs.cfgfile = os.path.join(configs.model_path, 'config', 'complex_yolov4.cfg')
@@ -61,7 +61,12 @@ def load_configs_model(model_name='darknet', configs=None):
         ####### ID_S3_EX1-3 START #######     
         #######
         print("student task ID_S3_EX1-3")
-
+        configs.model_path = os.path.join(parent_path, 'tools', 'objdet_models', 'resnet')
+        #configs.pretrained_filename = os.path.join(configs.model_path, 'pretrained', 'complex_yolov4_mse_loss.pth')
+        configs.pin_memory = True
+        configs.distributed = False  # For testing on 1 GPU only
+        configs.input_size = (608, 608)
+        configs.hm_size = (152, 152)
         #######
         ####### ID_S3_EX1-3 END #######     
 

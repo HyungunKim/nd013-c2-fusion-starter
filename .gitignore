@@ -2,5 +2,7 @@ data/
 dataset/
 venv/
 results/
+models/
+tools/objdet_models/resnet/pretrained/
 */__pycache__/
 **/__pycache__/
