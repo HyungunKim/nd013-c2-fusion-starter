@@ -29,6 +29,7 @@ from tools.objdet_models.resnet.utils.torch_utils import _sigmoid
 from tools.objdet_models.darknet.models.darknet2pytorch import Darknet as darknet
 from tools.objdet_models.darknet.utils.evaluation_utils import post_processing_v2
 
+from misc.objdet_tools import bev2meters
 
 # load model-related parameters into an edict
 def load_configs_model(model_name='darknet', configs=None):
@@ -44,7 +45,7 @@ def load_configs_model(model_name='darknet', configs=None):
     # set parameters according to model type
     if model_name == "darknet":
         configs.model_path = os.path.join(parent_path, 'tools', 'objdet_models', 'darknet')
-        #configs.pretrained_filename = os.path.join(configs.model_path, 'pretrained', 'complex_yolov4_mse_loss.pth')
+        configs.pretrained_filename = os.path.join(configs.model_path, 'pretrained', 'complex_yolov4_mse_loss.pth')
         configs.arch = 'darknet'
         configs.batch_size = 4
         configs.cfgfile = os.path.join(configs.model_path, 'config', 'complex_yolov4.cfg')
@@ -126,7 +127,7 @@ def load_configs(model_name='fpn_resnet', configs=None):
     # visualization parameters
     configs.output_width = 608 # width of result image (height may vary)
     configs.obj_colors = [[0, 255, 255], [0, 0, 255], [255, 0, 0]] # 'Pedestrian': 0, 'Car': 1, 'Cyclist': 2
-
+    configs.min_iou = 0.5
     return configs
 
 
@@ -190,7 +191,9 @@ def detect_objects(input_bev_maps, model, configs):
                     x, y, w, l, im, re, _, _, _ = obj
                     yaw = np.arctan2(im, re)
                     detections.append([1, x, y, 0.0, 1.50, w, l, yaw])
-            return detections
+
+            new_detections = bev2meters(detections, configs)
+            return new_detections
 
         elif 'fpn_resnet' in configs.arch:
             # decode output and perform post-processing
@@ -235,6 +238,6 @@ def detect_objects(input_bev_maps, model, configs):
 
     #######
     ####### ID_S3_EX2 START #######   
-    print(objects)
-    return objects    
+    return bev2meters(objects, configs)
+
 

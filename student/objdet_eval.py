@@ -49,17 +49,32 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             print("student task ID_S4_EX1 ")
 
             ## step 1 : extract the four corners of the current label bounding-box
-            
-            ## step 2 : loop over all detected objects
-
+            x, y, z, h, w, l, yaw = label.box.center_x, label.box.center_y, label.box.center_z, label.box.height, label.box.width, label.box.length, label.box.heading
+            [fl,rl,rr,fr] = tools.compute_box_corners(x, y, w, l, yaw)
+            poly = Polygon([fl,rl,rr,fr]).convex_hull
+            ## step 2 : loop over    all detected objects
+            max_iou = 0
+            for detection in detections:
                 ## step 3 : extract the four corners of the current detection
-                
+                _x, _y, _z, _h, _w, _l, _yaw = detection[1], detection[2], detection[3], detection[4], detection[5], detection[6], detection[7]
+                [_fl, _rl, _rr, _fr] = tools.compute_box_corners(_x, _y, _w, _l, _yaw)
+                _poly = Polygon([_fl, _rl, _rr, _fr])
                 ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
-                
+                dist_x, dist_y, dist_z = x - _x, y - _y, z - _z
+
                 ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
-                
+                inter_area = poly.intersection(_poly).area
+                union_area = poly.area + _poly.area - inter_area
+                if union_area == 0:
+                    iou = 0
+                else:
+                    iou = float(inter_area) / union_area
+
                 ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
-                
+                if iou > min_iou:
+                    matches_lab_det.append([iou, dist_x, dist_y, dist_z])
+                    if len(matches_lab_det) == 1:
+                        true_positives += 1
             #######
             ####### ID_S4_EX1 END #######     
             

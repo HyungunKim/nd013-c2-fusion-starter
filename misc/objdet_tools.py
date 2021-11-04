@@ -18,7 +18,7 @@ import cv2
 import numpy as np
 import math
 from shapely.geometry import Polygon
-
+from easydict import EasyDict as edict
 # add project directory to python path to enable relative imports
 import os
 import sys
@@ -191,8 +191,19 @@ def pcl_from_range_image(frame, lidar_name):
     return points_all
 
 
-
-
+# birds-eye view to meters
+def bev2meters(detections, configs):
+    new_detections = []
+    for row in detections:
+        _id, _x, _y, _z, _h, _w, _l, _yaw = row
+        y = _x / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0]) + configs.lim_y[0]
+        x = _y / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0]) + configs.lim_x[0]
+        z = _z - configs.lim_z[0]
+        w = _w * (configs.lim_y[1] - configs.lim_y[0]) / configs.bev_width
+        l = _l * (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
+        yaw = -_yaw
+        new_detections.append([1, x, y, z, _h, w, l, yaw])
+    return new_detections
 ##################
 # BIRDS-EYE VIEW
 
@@ -200,16 +211,23 @@ def pcl_from_range_image(frame, lidar_name):
 def project_detections_into_bev(bev_map, detections, configs, color=[]):
     for row in detections:
         # extract detection
-        print(row)
-        _id, _x, _y, _z, _h, _w, _l, _yaw = row
+        #new_row = bev2meters(row, configs)
 
+        _id, _x, _y, _z, _h, _w, _l, _yaw = row
         # convert from metric into pixel coordinates
-        x = _x #(_y - configs.lim_y[0]) / (configs.lim_y[1] - configs.lim_y[0]) * configs.bev_width
-        y = _y #(_x - configs.lim_x[0]) / (configs.lim_x[1] - configs.lim_x[0]) * configs.bev_height
+        x = (_y - configs.lim_y[0]) / (configs.lim_y[1] - configs.lim_y[0]) * configs.bev_width
+        y = (_x - configs.lim_x[0]) / (configs.lim_x[1] - configs.lim_x[0]) * configs.bev_height
         z = _z - configs.lim_z[0]
-        w = _w #/ (configs.lim_y[1] - configs.lim_y[0]) * configs.bev_width
-        l = _l #/ (configs.lim_x[1] - configs.lim_x[0]) * configs.bev_height
+        w = _w / (configs.lim_y[1] - configs.lim_y[0]) * configs.bev_width
+        l = _l / (configs.lim_x[1] - configs.lim_x[0]) * configs.bev_height
         yaw = -_yaw
+
+        # x = _x #(_y - configs.lim_y[0]) / (configs.lim_y[1] - configs.lim_y[0]) * configs.bev_width
+        # y = _y #(_x - configs.lim_x[0]) / (configs.lim_x[1] - configs.lim_x[0]) * configs.bev_height
+        # z = _z - configs.lim_z[0]
+        # w = _w #/ (configs.lim_y[1] - configs.lim_y[0]) * configs.bev_width
+        # l = _l #/ (configs.lim_x[1] - configs.lim_x[0]) * configs.bev_height
+        # yaw = -_yaw
 
         # draw object bounding box into birds-eye view
         if not color:
@@ -313,7 +331,6 @@ def compute_box_corners(x,y,w,l,yaw):
           y + w / 2 * sin_yaw + l / 2 * cos_yaw)
 
     return [fl,rl,rr,fr]
-
 
 # checks whether label is inside detection area
 def is_label_inside_detection_area(label, configs, min_overlap=0.5):
