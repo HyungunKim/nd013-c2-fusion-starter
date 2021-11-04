@@ -7,3 +7,5 @@ tools/objdet_models/resnet/pretrained/
 tools/objdet_models/darknet/pretrained/
 */__pycache__/
 **/__pycache__/
+writeup (template).md
+README (copy).md
