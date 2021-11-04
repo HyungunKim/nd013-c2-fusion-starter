@@ -86,7 +86,7 @@ exec_tracking = [] # options are 'perform_tracking'
 exec_visualization = ['show_detection_performance'] # options are 'show_range_image', 'show_bev', 'show_pcl', 'show_labels_in_image', 'show_objects_and_labels_in_bev', 'show_objects_in_bev_labels_in_camera', 'show_tracks', 'show_detection_performance', 'make_tracking_movie'
 exec_list = make_exec_list(exec_detection, exec_tracking, exec_visualization)
 vis_pause_time = 1 # set pause time between frames in ms (0 = stop between frames until key is pressed)
-
+vis_pcl = False
 
 ##################
 ## Perform detection & tracking over all selected frames
@@ -140,7 +140,7 @@ while True:
         ## Compute lidar birds-eye view (bev)
         if 'bev_from_pcl' in exec_list:
             print('computing birds-eye view from lidar pointcloud')
-            lidar_bev = pcl.bev_from_pcl(lidar_pcl, configs_det, vis=False)
+            lidar_bev = pcl.bev_from_pcl(lidar_pcl, configs_det, vis=vis_pcl)
         else:
             print('loading birds-eve view from result file')
             #lidar_bev = load_object_from_file(results_fullpath, data_filename, 'lidar_bev', cnt_frame)
