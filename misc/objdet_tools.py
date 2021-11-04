@@ -248,7 +248,6 @@ def project_detections_into_bev(bev_map, detections, configs, color=[]):
         
         # draw object as box
         corners_int = bev_corners.reshape(-1, 1, 2).astype(int)
-        print(corners_int)
 
         cv2.polylines(bev_map, [corners_int], True, color, 2)
 

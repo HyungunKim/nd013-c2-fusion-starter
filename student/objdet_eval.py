@@ -56,7 +56,7 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             max_iou = 0
             for detection in detections:
                 ## step 3 : extract the four corners of the current detection
-                _x, _y, _z, _h, _w, _l, _yaw = detection[1], detection[2], detection[3], detection[4], detection[5], detection[6], detection[7]
+                _x, _y, _z, _h, _w, _l, _yaw = float(detection[1]), float(detection[2]), float(detection[3]), float(detection[4]), float(detection[5]), float(detection[6]), detection[7]
                 [_fl, _rl, _rr, _fr] = tools.compute_box_corners(_x, _y, _w, _l, _yaw)
                 _poly = Polygon([_fl, _rl, _rr, _fr])
                 ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
@@ -92,13 +92,13 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     # compute positives and negatives for precision/recall
     
     ## step 1 : compute the total number of positives present in the scene
-    all_positives = 0
+    all_positives = len(detections)
 
     ## step 2 : compute the number of false negatives
-    false_negatives = 0
+    false_negatives = np.sum([1 for valid in labels_valid if valid ]) - true_positives
 
     ## step 3 : compute the number of false positives
-    false_positives = 0
+    false_positives = all_positives - true_positives
     
     #######
     ####### ID_S4_EX2 END #######     
@@ -126,12 +126,14 @@ def compute_performance_stats(det_performance_all):
     print('student task ID_S4_EX3')
 
     ## step 1 : extract the total number of positives, true positives, false negatives and false positives
-    
+    total_positives = np.sum([pos_neg[0] for pos_neg in pos_negs])
+    true_positives = np.sum([pos_neg[1] for pos_neg in pos_negs])
+    false_negatives = np.sum([pos_neg[2] for pos_neg in pos_negs])
+    false_positives = np.sum([pos_neg[3] for pos_neg in pos_negs])
     ## step 2 : compute precision
-    precision = 0.0
-
+    precision = true_positives / (true_positives + false_positives)
     ## step 3 : compute recall 
-    recall = 0.0
+    recall = true_positives / (true_positives + false_negatives)
 
     #######    
     ####### ID_S4_EX3 END #######     
