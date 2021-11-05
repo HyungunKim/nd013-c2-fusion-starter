@@ -207,7 +207,7 @@ def detect_objects(input_bev_maps, model, configs):
             decoded = decoded.cpu().numpy().astype(np.float32)
 
             output_post = post_processing(decoded, configs)
-
+            print(type(output_post))
             ####### ID_S3_EX1-5 END #######     
 
 

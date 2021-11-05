@@ -84,7 +84,7 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             ious.append(best_match[0])
             center_devs.append(best_match[1:])
 
-
+    print('Debug point')
     ####### ID_S4_EX2 START #######     
     #######
     print("student task ID_S4_EX2")
@@ -168,7 +168,7 @@ def compute_performance_stats(det_performance_all):
 
     # plot results
     data = [precision, recall, ious_all, devs_x_all, devs_y_all, devs_z_all]
-    titles = ['detection precision', 'detection recall', 'intersection over union', 'position errors in X', 'position errors in Y', 'position error in Z']
+    titles = [f'detection precision: {precision:.2f}', f'detection recall: {recall:.2f}', 'intersection over union', 'position errors in X', 'position errors in Y', 'position error in Z']
     textboxes = ['', '', '',
                  '\n'.join((r'$\mathrm{mean}=%.4f$' % (np.mean(devs_x_all), ), r'$\mathrm{sigma}=%.4f$' % (np.std(devs_x_all), ), r'$\mathrm{n}=%.0f$' % (len(devs_x_all), ))),
                  '\n'.join((r'$\mathrm{mean}=%.4f$' % (np.mean(devs_y_all), ), r'$\mathrm{sigma}=%.4f$' % (np.std(devs_y_all), ), r'$\mathrm{n}=%.0f$' % (len(devs_x_all), ))),
