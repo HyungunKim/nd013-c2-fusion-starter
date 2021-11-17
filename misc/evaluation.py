@@ -143,7 +143,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
     
     # maximize window        
     mng = plt.get_current_fig_manager()
-    mng.frame.Maximize(True)
+    #mng.frame.Maximize(True)
     
     # axis 
     ax.set_xlabel('y [m]')
@@ -162,7 +162,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
         if label not in label_list:
             handle_list.append(handle)
             label_list.append(label)
-    ax.legend(handle_list, label_list, loc='center left', shadow=True, fontsize='x-large', bbox_to_anchor=(0.8, 0.5))
+    ax.legend(handle_list, label_list, loc='upper right', shadow=True)
 
     plt.pause(0.01)
     
@@ -218,12 +218,13 @@ def plot_rmse(manager, all_labels, configs_det):
     
     # maximize window     
     mng = plt.get_current_fig_manager()
-    mng.frame.Maximize(True)
+    #mng.frame.Maximize(True)
     ax.set_ylim(0,1)
     if plot_empty: 
         print('No confirmed tracks found to plot RMSE!')
     else:
-        plt.legend(loc='center left', shadow=True, fontsize='x-large', bbox_to_anchor=(0.9, 0.5))
+        #plt.legend(loc='center left', shadow=True, fontsize='x-large', bbox_to_anchor=(0.9, 0.5))
+        plt.legend(loc='center right', shadow=True)
         plt.xlabel('time [s]')
         plt.ylabel('RMSE [m]')
         plt.show()
