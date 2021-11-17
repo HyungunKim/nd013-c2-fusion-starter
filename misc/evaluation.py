@@ -162,7 +162,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
         if label not in label_list:
             handle_list.append(handle)
             label_list.append(label)
-    ax.legend(handle_list, label_list, loc='upper right', shadow=True)
+    ax.legend(handle_list, label_list, loc='upper right', shadow=True, bbox_to_anchor = (0.5, 1.3))
 
     plt.pause(0.01)
     

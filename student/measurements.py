@@ -84,7 +84,7 @@ class Sensor:
             pos_veh = np.ones((4, 1))  # homogeneous coordinates
             pos_veh[0:3] = x[0:3]
             pos_sens = self.veh_to_sens * pos_veh
-            x[0:3] = pos_sens[0:3]
+            #x[0:3] = pos_sens[0:3]
 
             # calculate nonlinear measurement expectation value h(x)
             hx = np.zeros((2, 1))
@@ -92,8 +92,8 @@ class Sensor:
             if x[0] == 0:
                 raise NameError('Jacobian not defined for x[0]=0!')
             else:
-                hx[0, 0] = self.c_i - self.f_i * x[1] / x[0]  # project to image coordinates
-                hx[1, 0] = self.c_j - self.f_j * x[2] / x[0]
+                hx[0, 0] = self.c_i - self.f_i * pos_sens[1] / pos_sens[0]  # project to image coordinates
+                hx[1, 0] = self.c_j - self.f_j * pos_sens[2] / pos_sens[0]
                 return hx
 
                 ############

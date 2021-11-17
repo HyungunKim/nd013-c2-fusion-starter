@@ -34,16 +34,16 @@ class Track:
         # unassigned measurement transformed from sensor to vehicle coordinates
         # - initialize track state and track score with appropriate values
         ############
-        pos = meas.sensor.sens_to_veh * np.matrix([[meas.z[0][0]],
-                                                   [meas.z[1][0]],
-                                                   [meas.z[2][0]],
+        pos = meas.sensor.sens_to_veh * np.matrix([[meas.z[0][0].item()],
+                                                   [meas.z[1][0].item()],
+                                                   [meas.z[2][0].item()],
                                                    [1        ]])
 
         R = meas.R
         Ppos = M_rot * R * M_rot.transpose()
-        self.x = np.matrix([[pos[0][0]],
-                            [pos[1][0]],
-                            [pos[2][0]],
+        self.x = np.matrix([[pos[0][0].item()],
+                            [pos[1][0].item()],
+                            [pos[2][0].item()],
                             [0.        ],
                             [0.        ],
                             [0.        ]])
